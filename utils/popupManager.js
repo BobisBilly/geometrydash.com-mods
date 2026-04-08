@@ -11,5 +11,9 @@ globalThis.createPopup = function(popupTextData) {
         if (popupTextData[currentTextIndex] != false) {
             infoPopup.list[currentTextIndex + 3].setText(popupTextData[currentTextIndex])
         }
+
+        if (popupTextData[currentTextIndex] == null) {
+            infoPopup.list[currentTextIndex + 3].destroy()
+        }
   }
 }
