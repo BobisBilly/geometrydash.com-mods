@@ -1,6 +1,6 @@
 const gameScene = Phaser.Display.Canvas.CanvasPool.pool[0].parent.game.scene.getScenes(false)[1]
 
-function createPopup(popupTextData) {
+globalThis.createPopup = function(popupTextData) {
     gameScene._buildInfoPopup()
 
     const infoPopup = gameScene._infoPopup
@@ -11,5 +11,5 @@ function createPopup(popupTextData) {
         if (popupTextData[currentTextIndex] != false) {
             infoPopup.list[currentTextIndex + 3].setText(popupTextData[currentTextIndex])
         }
-    }
+  }
 }
