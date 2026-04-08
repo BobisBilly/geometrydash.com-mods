@@ -1,7 +1,11 @@
 // Required Script Setup \\
-await fetch('https://raw.githubusercontent.com/BobisBilly/geometrydash.com-mods/refs/heads/main/utils/popupManager.js')
+async function setupRequiredScripts(scriptList) {
+    for (let currentScript = 0; currentScript < scriptList.length; currentScript++) {
+        await fetch(scriptList[currentScript])
   .then(response => response.text())
   .then(code => eval(code));
+    }
+}
 
 // Public Variables \\
 const gameScene = Phaser.Display.Canvas.CanvasPool.pool[0].parent.game.scene.getScenes(false)[1]
@@ -66,4 +70,8 @@ gameScene._startGame = function() {
     return result
 }
 
-onlineBtnSetup(true)
+setupRequiredScripts([
+    "https://raw.githubusercontent.com/BobisBilly/geometrydash.com-mods/refs/heads/main/utils/popupManager.js"
+]).then(() => {
+    onlineBtnSetup(true)
+});
