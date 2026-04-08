@@ -1,5 +1,3 @@
-const gameScene = Phaser.Display.Canvas.CanvasPool.pool[0].parent.game.scene.getScenes(false)[1]
-
 globalThis.createPopup = function(popupTextData) {
     gameScene._buildInfoPopup()
 
