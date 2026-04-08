@@ -13,7 +13,7 @@ globalThis.createPopup = function(popupTextData) {
         }
 
         if (popupTextData[currentTextIndex] == null) {
-            infoPopup.list[currentTextIndex + 3].destroy()
+            infoPopup.list[currentTextIndex + 3].setText("")
         }
   }
 }
