@@ -18,14 +18,65 @@ texture.add('BB_onlineBtn_001', 0, frameX, frameY, frameW, frameH);
 // Original Hook Variables \\
 const makeBouncyButton = gameScene._makeBouncyButton
 const startGame = gameScene._startGame
+const create = gameScene.create
 
 // Functions \\
-function openLevelSearchMenu() {
-    // To-Do: Make UI for level searching
-    // Currently starts "Stereo Madness"
+async function NGSongIdToAudio(songID) {
+    console.log("Attempting song download:", songID);
+    const r = await fetch(`https://gd.bobisbilly.com/ng/${songID}`);
     
-    gameScene._audio.playEffect("playSound_01")
-    gameScene._startGame()
+    if (!r.ok) throw new Error("Song download failed");
+
+    const songBuffer = await r.arrayBuffer();
+    const audioContext = gameScene.sound.context;
+    
+    // Decoding the audio
+    return await audioContext.decodeAudioData(songBuffer);
+}
+
+async function setupLevelWithID(levelID) {
+    const downloadedData = await fetch("https://gd.bobisbilly.com/gd", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ secret: "Wmfd2893gb7", levelID: levelID })
+    });
+    
+    const levelData = await downloadedData.text();
+    const parts = levelData.split(":");
+    const levelDataIndex = parts.indexOf("4");
+    const songIDIndex = parts.indexOf("35");
+
+    try {
+        const songID = parts[songIDIndex + 1];
+        const audioBuffer = await NGSongIdToAudio(songID);
+        
+        gameScene.cache.audio.add('custom_song', audioBuffer);
+    } catch (err) {
+        console.warn(err);
+    }
+    gameScene.cache.text.entries.set("level_1", parts[levelDataIndex + 1]);
+}
+
+async function openLevelSearchMenu() {
+    if (this.isLoading) return;
+    this.isLoading = true;
+
+    publicOnlineBtn.setAlpha(0.5);
+    gameScene._audio.playEffect("playSound_01");
+
+    try {
+        // Currently loads "1st Level" but fails to get audio because its "Base After Base" (Intentional)
+        await setupLevelWithID(128);
+        
+        gameScene.scene.restart({ isCustomLevel: true });
+    } catch (e) {
+        console.error("Setup failed:", e);
+        publicOnlineBtn.setAlpha(1);
+        gameScene.scene.restart({ isCustomLevel: true });
+        this.isLoading = false;
+    } finally {
+        this.isLoading = false;
+    }
 }
 
 function onlineBtnSetup(firstLaunch) {
@@ -66,6 +117,32 @@ gameScene._startGame = function() {
     }
 
     const result = startGame.apply(this);
+
+    return result
+}
+
+gameScene.create = function(data) {
+    if(data && data.isCustomLevel) {
+        data.isCustomLevel = false
+        
+        gameScene._audio.pauseMusic()
+
+        setTimeout(() => {
+            gameScene.scene.restart({startPlaying: true})
+        }, 1000)
+    } else if (data && data.startPlaying) {
+        if (gameScene.cache.audio.entries.entries.custom_song) {
+            gameScene._audio.playEffect("custom_song")
+        }
+        
+        data.startPlaying = false
+        
+        setTimeout(() => {
+            gameScene._startGame()
+        }, 100)
+    }
+
+    const result = create.apply(this);
 
     return result
 }
