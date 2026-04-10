@@ -12,4 +12,8 @@ gameWindow.fetch('https://raw.githubusercontent.com/BobisBilly/geometrydash.com-
   .then(code => gameWindow.eval(code));
 ```
 
-If you find any bugs please share them.
+> [!NOTE]
+> If you find any bugs please share them.
+
+> [!WARNING]
+> If the level doesn't load, blame my Raspberry Pi for doing something wrong
